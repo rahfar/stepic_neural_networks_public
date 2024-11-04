@@ -1,0 +1,77 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[utf8]{inputenc} % for UTF-8 support, important for Cyrillic characters
+\usepackage[russian,english]{babel} % support for Russian and English
+
+\begin{document}
+\selectlanguage{russian}
+
+Целевая функция для мультиклассовой классификации:
+
+\[
+\mathcal{J} = -\frac{1}{n} \sum_i \sum_p \left[ y_p^{(i)} \ln a_p^{L(i)} + (1 - y_p^{(i)}) \ln (1 - a_p^{L(i)}) \right]
+\]
+
+Обозначения:
+\[
+z_j^L(x) = \sum_k w_{jk}^L x_k + b_j^L
+\]
+
+\[
+a_j^L(x) = \sigma \left( z_j^L(x) \right) = \sigma \left( \sum_k w_{jk}^L x_k + b_j^L \right)
+\]
+
+Возьмем частную производную по весам и смещениям последнего слоя:
+\[
+\begin{gathered}
+\frac{\partial \mathcal{J}}{\partial w_{jk}^L} = -\frac{1}{n} \sum_i \sum_p \left[ y_p^{(i)} \frac{\partial \ln a_p^{L(i)}}{\partial w_{jk}^L} + (1 - y_p^{(i)}) \frac{\partial \ln (1 - a_p^{L(i)})}{\partial w_{jk}^L} \right] = \\
+= -\frac{1}{n} \sum_i \left[ y_j^{(i)} \frac{\partial \ln a_j^{L(i)}}{\partial w_{jk}^L} + (1 - y_j^{(i)}) \frac{\partial \ln (1 - a_j^{L(i)})}{\partial w_{jk}^L} \right]
+\end{gathered}
+\]
+
+\[
+\begin{gathered}
+\frac{\partial \mathcal{J}}{\partial b_{j}^L} = -\frac{1}{n} \sum_i \sum_p \left[ y_p^{(i)} \frac{\partial \ln a_p^{L(i)}}{\partial b_{j}^L} + (1 - y_p^{(i)}) \frac{\partial \ln (1 - a_p^{L(i)})}{\partial b_{j}^L} \right] = \\
+= -\frac{1}{n} \sum_i \left[ y_j^{(i)} \frac{\partial \ln a_j^{L(i)}}{\partial b_{j}^L} + (1 - y_j^{(i)}) \frac{\partial \ln (1 - a_j^{L(i)})}{\partial b_{j}^L} \right]
+\end{gathered}
+\]
+
+
+Посчитаем производные отдельно, опуская индекс примера (i):
+
+\[
+\frac{\partial \ln a_j^L}{\partial w_{jk}^L} = \frac{\partial \ln a_j^L}{\partial a_j^L} \cdot \frac{\partial a_j^L}{\partial w_{jk}^L} = \frac{1}{a_j^L} \cdot \sigma' (z_j^L) \cdot a_k^{(L-1)} = \frac{\sigma(z_j^L) \cdot (1 - \sigma(z_j^L))}{a_j^L} \cdot a_k^{L-1} = (1 - a_j^L) \cdot a_k^{L-1}
+\]
+
+\[
+\frac{\partial \ln (1 - a_j^L)}{\partial w_{jk}^L} = \frac{1}{1 - a_j^L} \cdot \left( -\sigma' (z_j^L) \cdot a_k^{(L-1)} \right) = - \frac{\sigma(z_j^L) \cdot (1 - \sigma(z_j^L))}{1 - a_j^L} \cdot a_k^{L-1} = -a_j^L \cdot a_k^{L-1}
+\]
+
+\[
+\frac{\partial \ln a_j^L}{\partial b_{j}^L} = \frac{\partial \ln a_j^L}{\partial a_j^L} \cdot \frac{\partial a_j^L}{\partial b_{j}^L} = \frac{1}{a_j^L} \cdot \sigma' (z_j^L) = \frac{\sigma(z_j^L) \cdot (1 - \sigma(z_j^L))}{a_j^L} = (1 - a_j^L)
+\]
+
+\[
+\frac{\partial \ln (1 - a_j^L)}{\partial b_{j}^L} = \frac{1}{1 - a_j^L} \cdot -\sigma' (z_j^L) = - \frac{\sigma(z_j^L) \cdot (1 - \sigma(z_j^L))}{1 - a_j^L} = -a_j^L
+\]
+
+
+Подставляем обратно и упрощаем:
+
+\[
+\begin{gathered}
+\frac{\partial \mathcal{J}}{\partial w_{jk}^L} = -\frac{1}{n} \sum_i \left[ y_j^{(i)} \cdot (1 - a_j^{L(i)}) \cdot a_k^{L-1(i)}  + (1 - y_j^{(i)}) \cdot -a_j^{L(i)} \cdot a_k^{L-1(i)} \right] = \\ = -\frac{1}{n} \sum_i a_k^{L-1(i)} \cdot (y_j^{L(i)} - a_j^{L(i)})
+\end{gathered}
+\]
+
+\[
+\begin{gathered}
+\frac{\partial \mathcal{J}}{\partial b_{j}^L} = -\frac{1}{n} \sum_i \left[ y_j^{(i)} \cdot (1 - a_j^{L(i)}) + (1 - y_j^{(i)}) \cdot -a_j^{L(i)} \right] = -\frac{1}{n} \sum_i (y_j^{L(i)} - a_j^{L(i)})
+\end{gathered}
+\]
+
+\[
+\delta_j = \frac{1}{n} \sum_i f_j \cdot (a_j^{L(i)} - y_j^{L(i)})
+\]
+\end{document}
